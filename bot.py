@@ -36,17 +36,6 @@ class Phone(Field):
         return True
 
 
-# class Phone(Field):
-#     def __init__(self, value):
-#         super().__init__(value)
-
-#     def valid_phone(self, phone):
-#         if len(phone) != 10 or phone.isdigit() == False:
-#             print("\033[31m{}\033[0m".format("The number must consist of 10 digits. try again"))
-#         else:
-#             return phone
-
-
 class Birthday(Field):
     def __init__(self, value):
         super().__init__(value)
@@ -70,8 +59,6 @@ class Record:
         self.birthday = None
 
     def add_phone(self, phone):
-        # if Phone(phone).valid_phone(phone):
-        #     self.phones.append(Phone(phone))
         self.phones.append(Phone(phone))
 
     def add_birthday(self, birthday):
@@ -96,13 +83,6 @@ class Record:
                 return p
 
     def edit_phone(self, old_phone, new_phone):
-        # if Phone(new_phone).valid_phone(new_phone):
-        #     for p in self.phones:
-        #         if p.value == old_phone:
-        #             p.value = new_phone
-        #             return "\033[32m{}\033[0m".format("Contact changed.")
-        #         else:
-        #             return "\033[31m{}\033[0m".format("Please enter a correct phone.")
         for p in self.phones:
             if p.value == old_phone:
                 if Phone(new_phone):
@@ -211,12 +191,6 @@ def add_contact(args, book):
 @input_error
 def change_username_phone(args, book):
     name, old_phone, new_phone = args
-    # if Phone(new_phone).valid_phone(new_phone):
-    #     if book.find(name) != None:
-    #         rez = book.find(name)
-    #         return rez.edit_phone(old_phone, new_phone)
-    #     else:
-    #         raise KeyError    
     if book.find(name) != None:
         rez = book.find(name)
         return rez.edit_phone(old_phone, new_phone)
