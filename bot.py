@@ -5,6 +5,11 @@ from datetime import datetime
 from datetime import timedelta
 
 
+class PhoneValueError(Exception):
+    def __init__(self):
+        pass
+
+
 class Field:
     def __init__(self, value):
         self.value = value
@@ -20,13 +25,26 @@ class Name(Field):
 
 class Phone(Field):
     def __init__(self, value):
-        super().__init__(value)
-
-    def valid_phone(self, phone):
-        if len(phone) != 10 or phone.isdigit() == False:
-            print("\033[31m{}\033[0m".format("The number must consist of 10 digits. try again"))
+        if self.__valid_phone(value):
+            self.value = value
         else:
-            return phone
+            raise PhoneValueError
+    
+    def __valid_phone(self, phone):
+        if len(phone) != 10 or not phone.isdigit():
+            return False
+        return True
+
+
+# class Phone(Field):
+#     def __init__(self, value):
+#         super().__init__(value)
+
+#     def valid_phone(self, phone):
+#         if len(phone) != 10 or phone.isdigit() == False:
+#             print("\033[31m{}\033[0m".format("The number must consist of 10 digits. try again"))
+#         else:
+#             return phone
 
 
 class Birthday(Field):
@@ -52,8 +70,9 @@ class Record:
         self.birthday = None
 
     def add_phone(self, phone):
-        if Phone(phone).valid_phone(phone):
-            self.phones.append(Phone(phone))
+        # if Phone(phone).valid_phone(phone):
+        #     self.phones.append(Phone(phone))
+        self.phones.append(Phone(phone))
 
     def add_birthday(self, birthday):
         if self.birthday == None and Birthday(birthday).valid_birthday(birthday):
@@ -77,13 +96,22 @@ class Record:
                 return p
 
     def edit_phone(self, old_phone, new_phone):
-        if Phone(new_phone).valid_phone(new_phone):
-            for p in self.phones:
-                if p.value == old_phone:
+        # if Phone(new_phone).valid_phone(new_phone):
+        #     for p in self.phones:
+        #         if p.value == old_phone:
+        #             p.value = new_phone
+        #             return "\033[32m{}\033[0m".format("Contact changed.")
+        #         else:
+        #             return "\033[31m{}\033[0m".format("Please enter a correct phone.")
+        for p in self.phones:
+            if p.value == old_phone:
+                if Phone(new_phone):
                     p.value = new_phone
                     return "\033[32m{}\033[0m".format("Contact changed.")
                 else:
-                    return "\033[31m{}\033[0m".format("Please enter a correct phone.")
+                    raise PhoneValueError
+            else:
+                return "\033[31m{}\033[0m".format("Please enter a correct phone.")
 
 
 class AddressBook(UserDict):    
@@ -164,6 +192,8 @@ def input_error(func):
             return "\033[31m{}\033[0m".format("Give me name please.")
         except KeyError:
             return "\033[31m{}\033[0m".format("Please enter a correct name.")
+        except PhoneValueError:
+            return ("\033[31m{}\033[0m".format("The number must consist of 10 digits. try again"))
         except:
             return "\033[31m{}\033[0m".format("Oops, something went wrong, try again.")
     return inner
@@ -181,13 +211,17 @@ def add_contact(args, book):
 @input_error
 def change_username_phone(args, book):
     name, old_phone, new_phone = args
-    name = name.lower()
-    if Phone(new_phone).valid_phone(new_phone):
-        if book.find(name) != None:
-            rez = book.find(name)
-            return rez.edit_phone(old_phone, new_phone)
-        else:
-            raise KeyError    
+    # if Phone(new_phone).valid_phone(new_phone):
+    #     if book.find(name) != None:
+    #         rez = book.find(name)
+    #         return rez.edit_phone(old_phone, new_phone)
+    #     else:
+    #         raise KeyError    
+    if book.find(name) != None:
+        rez = book.find(name)
+        return rez.edit_phone(old_phone, new_phone)
+    else:
+        raise KeyError   
        
 
 @input_error
@@ -207,7 +241,6 @@ def all_phone_print(book):
 @input_error
 def add_birthday(args, book):
     name, birthday = args
-    name = name.lower()
     res = book.find(name)
     return res.add_birthday(birthday)
      
